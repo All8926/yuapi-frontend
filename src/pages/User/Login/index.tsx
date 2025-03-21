@@ -1,5 +1,4 @@
 import {Footer} from '@/components';
-import {login} from '@/services/ant-design-pro/api';
 import {getFakeCaptcha} from '@/services/ant-design-pro/login';
 import {
   AlipayCircleOutlined,
@@ -22,6 +21,7 @@ import React, {useState} from 'react';
 import {flushSync} from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
 import {userLoginUsingPost} from "@/services/api-backend/userController";
+// import UserVO = API.UserVO;
 
 const useStyles = createStyles(({token}) => {
   return {
@@ -68,10 +68,7 @@ const ActionIcons = () => {
     </>
   );
 };
-const Lang = () => {
-  const {styles} = useStyles();
-  return;
-};
+
 const LoginMessage: React.FC<{
   content: string;
 }> = ({content}) => {
@@ -87,13 +84,20 @@ const LoginMessage: React.FC<{
   );
 };
 const Login: React.FC = () => {
-  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
+  const [userLoginState ] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
 
   const {styles} = useStyles();
-  const {initialState, setInitialState} = useModel('@@initialState');
+  const {   setInitialState} = useModel('@@initialState');
 
-  console.log('initialState', initialState)
+  const fetchUserInfo = (userinfo:API.UserVO):void => {
+    if(userinfo){
+      flushSync(() => {
+        setInitialState((s) => ({ ...s, loginUser: userinfo }));
+      })
+    }
+  }
+
   const handleSubmit = async (values: API.UserLoginRequest) => {
     try {
 
@@ -104,12 +108,8 @@ const Login: React.FC = () => {
       if (res.data) {
         const defaultLoginSuccessMessage = '登录成功！';
         message.success(defaultLoginSuccessMessage);
-        // await fetchUserInfo();
+        await fetchUserInfo(res.data);
         const urlParams = new URL(window.location.href).searchParams;
-        await setInitialState({
-          loginUser: res.data
-        } )
-        console.log('initialState', initialState)
         history.push(urlParams.get('redirect') || '/');
         return;
       }
@@ -128,7 +128,6 @@ const Login: React.FC = () => {
           {'登录'}- {Settings.title}
         </title>
       </Helmet>
-      <Lang/>
       <div
         style={{
           flex: '1',

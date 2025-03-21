@@ -6,6 +6,8 @@ import {InitialState} from "@/typings";
 export default function access(initialState: InitialState | undefined) {
   const { loginUser } = initialState ?? {};
   return {
-    canAdmin: loginUser && loginUser.userAccount === 'admin',
+    canUser:loginUser,
+    canAdmin:  loginUser?.userRole === 'admin',
   };
 }
+

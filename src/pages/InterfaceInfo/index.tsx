@@ -1,4 +1,4 @@
-import { addRule, removeRule, rule, updateRule } from '@/services/ant-design-pro/api';
+import { addRule, removeRule,   updateRule } from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
@@ -11,17 +11,23 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import '@umijs/max';
-import { Button, Drawer, Input, message } from 'antd';
+import { Button, Drawer,   message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+import {SortOrder} from "antd/lib/table/interface";
+import {listInterfaceInfoByPageUsingGet} from "@/services/api-backend/interfaceInfoController";
+import {RequestData} from "@ant-design/pro-table/lib";
+import CreateForm from "@/pages/InterfaceInfo/components/CreateForm";
 
 /**
  * @en-US Add node
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.RuleListItem) => {
+const handleAdd = async (fields: API.InterfaceInfo) => {
+  console.log(fields)
+  return
   const hide = message.loading('正在添加');
   try {
     await addRule({
@@ -29,11 +35,11 @@ const handleAdd = async (fields: API.RuleListItem) => {
     });
     hide();
     message.success('Added successfully');
-    return true;
+    // return true;
   } catch (error) {
     hide();
     message.error('Adding failed, please try again!');
-    return false;
+    // return false;
   }
 };
 
@@ -104,35 +110,54 @@ const TableList: React.FC = () => {
    * @zh-CN 国际化配置
    * */
 
-  const columns: ProColumns<API.RuleListItem>[] = [
+
+
+  const columns: ProColumns<API.InterfaceInfo>[] = [
     {
-      title: '规则名称',
+      title: '接口名称',
       dataIndex: 'name',
-      tip: 'The rule name is the unique key',
-      render: (dom, entity) => {
-        return (
-          <a
-            onClick={() => {
-              setCurrentRow(entity);
-              setShowDetail(true);
-            }}
-          >
-            {dom}
-          </a>
-        );
-      },
+      valueType: 'text',
     },
     {
+      title: '请求方法',
+      dataIndex: 'method',
+      valueType: 'text',
+    },
+    {
+      title: 'url',
+      dataIndex: 'url',
+      valueType: 'text',
+    },
+
+    {
       title: '描述',
-      dataIndex: 'desc',
+      dataIndex: 'description',
       valueType: 'textarea',
     },
     {
-      title: '服务调用次数',
-      dataIndex: 'callNo',
-      sorter: true,
-      hideInForm: true,
-      renderText: (val: string) => `${val}${'万'}`,
+      title: '请求头',
+      dataIndex: 'requestHeader',
+      valueType: 'text',
+    },
+    {
+      title: '响应头',
+      dataIndex: 'responseHeader',
+      valueType: 'text',
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createTime',
+      valueType: 'time',
+    },
+    {
+      title: '更新时间',
+      dataIndex: 'updateTime',
+      valueType: 'time',
+    },
+    {
+      title: '创建人id',
+      dataIndex: 'userId',
+      valueType: 'text',
     },
     {
       title: '状态',
@@ -144,33 +169,9 @@ const TableList: React.FC = () => {
           status: 'Default',
         },
         1: {
-          text: '运行中',
+          text: '开启',
           status: 'Processing',
         },
-        2: {
-          text: '已上线',
-          status: 'Success',
-        },
-        3: {
-          text: '异常',
-          status: 'Error',
-        },
-      },
-    },
-    {
-      title: '上次调度时间',
-      sorter: true,
-      dataIndex: 'updatedAt',
-      valueType: 'dateTime',
-      renderFormItem: (item, { defaultRender, ...rest }, form) => {
-        const status = form.getFieldValue('status');
-        if (`${status}` === '0') {
-          return false;
-        }
-        if (`${status}` === '3') {
-          return <Input {...rest} placeholder={'请输入异常原因！'} />;
-        }
-        return defaultRender(item);
       },
     },
     {
@@ -185,10 +186,7 @@ const TableList: React.FC = () => {
             setCurrentRow(record);
           }}
         >
-          配置
-        </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          订阅警报
+          修改
         </a>,
       ],
     },
@@ -213,7 +211,25 @@ const TableList: React.FC = () => {
             <PlusOutlined /> 新建
           </Button>,
         ]}
-        request={rule}
+        request={ async (params:  {
+          pageSize?: number;
+          current?: number;
+          keyword?: string;
+        }, sort: Record<string, SortOrder>, filter: Record<string, (string | number)[] | null>) => {
+          const res = await listInterfaceInfoByPageUsingGet(params)
+          let result:RequestData<API.RuleListItem> = {
+            data: [],
+            success: false,
+            total: 0,
+          }
+          if(res.data){
+             result.data = res.data.records
+             result.total = res.data.total
+             result.success = true
+          }
+          console.log(result)
+          return result
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
@@ -252,33 +268,8 @@ const TableList: React.FC = () => {
           <Button type="primary">批量审批</Button>
         </FooterToolbar>
       )}
-      <ModalForm
-        title={'新建规则'}
-        width="400px"
-        open={createModalOpen}
-        onOpenChange={handleModalOpen}
-        onFinish={async (value) => {
-          const success = await handleAdd(value as API.RuleListItem);
-          if (success) {
-            handleModalOpen(false);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-      >
-        <ProFormText
-          rules={[
-            {
-              required: true,
-              message: '规则名称为必填项',
-            },
-          ]}
-          width="md"
-          name="name"
-        />
-        <ProFormTextArea width="md" name="desc" />
-      </ModalForm>
+
+      <CreateForm columns={columns} onCancel={() => handleModalOpen(false)} onSubmit={(values:API.InterfaceInfo) => handleAdd(values)} visible={createModalOpen}></CreateForm>
       <UpdateForm
         onSubmit={async (value) => {
           const success = await handleUpdate(value);
