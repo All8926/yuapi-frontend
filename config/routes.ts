@@ -12,7 +12,7 @@
     access: 'canAdmin',
     routes: [
       { path: '/admin', redirect: '/admin/interface_info' },
-      { path: '/admin/interface_info', name: '接口管理', component: './InterfaceInfo' },
+      { path: '/admin/interface_info', name: '接口管理', component: './Admin/InterfaceInfo' },
     ],
   },
   { path: '/', redirect: '/welcome' },

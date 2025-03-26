@@ -18,12 +18,12 @@ export type CreateFormProps = {
   columns: ProColumns<API.InterfaceInfo>[];
   visible: boolean;
 };
-const CreateForm: React.FC<CreateFormProps> = (props) => {
+const CreateModal: React.FC<CreateFormProps> = (props) => {
   const {visible,onCancel, onSubmit,columns} = props;
   return (
-    <Modal visible={visible} onCancel={() => onCancel() }>
+    <Modal visible={visible} onCancel={() => onCancel() } footer={null}>
       <ProTable type={"form"} columns={columns} onSubmit={(value) => onSubmit(value)}></ProTable>
     </Modal>
   );
 };
-export default CreateForm;
+export default CreateModal;
