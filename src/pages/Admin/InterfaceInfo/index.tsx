@@ -1,20 +1,14 @@
-import {addRule, removeRule, updateRule} from '@/services/ant-design-pro/api';
+
 import {PlusOutlined} from '@ant-design/icons';
-import type {ActionType, ProColumns, ProDescriptionsItemProps} from '@ant-design/pro-components';
+import type {ActionType, ProColumns } from '@ant-design/pro-components';
 import {
   FooterToolbar,
-  ModalForm,
   PageContainer,
-  ProDescriptions,
-  ProFormText,
-  ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
 import '@umijs/max';
-import {Button, Drawer, message} from 'antd';
+import {Button,  message} from 'antd';
 import React, {useRef, useState} from 'react';
-import type {FormValueType} from './components/UpdateForm';
-import UpdateForm from './components/UpdateForm';
 import {SortOrder} from "antd/lib/table/interface";
 import {
   addInterfaceInfoUsingPost,
@@ -411,7 +405,7 @@ const TableList: React.FC = () => {
         </FooterToolbar>
       )}
 
-      <CreateModal columns={columns} onCancel={() => handleModalOpen(false)}
+      <CreateModal  columns={columns} onCancel={() => handleModalOpen(false)}
                    onSubmit={(values: API.InterfaceInfo) => handleAdd(values)} visible={createModalOpen}></CreateModal>
       <UpdateModal onCancel={() => handleUpdateModalOpen(false)} values={currentRow || {}}
                    onSubmit={(values: API.InterfaceInfo) => handleUpdate(values)} columns={columns}

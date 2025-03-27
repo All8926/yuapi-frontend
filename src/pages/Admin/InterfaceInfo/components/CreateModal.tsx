@@ -9,7 +9,8 @@ import {
 } from '@ant-design/pro-components';
 import '@umijs/max';
 import { Modal } from 'antd';
-import React from 'react';
+import React, {useImperativeHandle, useRef} from 'react';
+import {ProFormInstance} from "@ant-design/pro-form/lib";
 
 
 export type CreateFormProps = {
@@ -19,10 +20,16 @@ export type CreateFormProps = {
   visible: boolean;
 };
 const CreateModal: React.FC<CreateFormProps> = (props) => {
+  const formRef = useRef<ProFormInstance>();
   const {visible,onCancel, onSubmit,columns} = props;
+
+
   return (
     <Modal visible={visible} onCancel={() => onCancel() } footer={null}>
-      <ProTable type={"form"} columns={columns} onSubmit={(value) => onSubmit(value)}></ProTable>
+      <ProTable type={"form"} formRef={formRef} columns={columns} onSubmit={  async (value) => {
+       await  onSubmit(value)
+          formRef.current?.resetFields()
+      }}> </ProTable>
     </Modal>
   );
 };
