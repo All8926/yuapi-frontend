@@ -217,9 +217,22 @@ const TableList: React.FC = () => {
       }
     },
     {
+      title: '请求参数',
+      dataIndex: 'requestParams',
+      valueType: 'jsonCode',
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: '请求参数不能为空'
+          }
+        ]
+      }
+    },
+    {
       title: '请求头',
       dataIndex: 'requestHeader',
-      valueType: 'text',
+      valueType: 'jsonCode',
       formItemProps: {
         rules: [
           {
@@ -229,10 +242,11 @@ const TableList: React.FC = () => {
         ]
       }
     },
+
     {
       title: '响应头',
       dataIndex: 'responseHeader',
-      valueType: 'text',
+      valueType: 'jsonCode',
       formItemProps: {
         rules: [
           {
@@ -242,18 +256,18 @@ const TableList: React.FC = () => {
         ]
       }
     },
-    {
-      title: '创建时间',
-      dataIndex: 'createTime',
-      valueType: 'time',
-      hideInForm: true
-    },
-    {
-      title: '更新时间',
-      dataIndex: 'updateTime',
-      valueType: 'time',
-      hideInForm: true
-    },
+    // {
+    //   title: '创建时间',
+    //   dataIndex: 'createTime',
+    //   valueType: 'time',
+    //   hideInForm: true
+    // },
+    // {
+    //   title: '更新时间',
+    //   dataIndex: 'updateTime',
+    //   valueType: 'time',
+    //   hideInForm: true
+    // },
     {
       title: '创建人id',
       dataIndex: 'userId',

@@ -1,5 +1,5 @@
 import {PageContainer} from '@ant-design/pro-components';
-import {Descriptions,  message, Tag} from 'antd';
+import {Descriptions, Input, message, Tag, Form, Button} from 'antd';
 import {  useParams} from '@umijs/max';
 import {Card, theme} from 'antd';
 import React, {useEffect, useState} from 'react';
@@ -51,7 +51,33 @@ const InterfaceInfo: React.FC = () => {
         <Descriptions.Item label="创建时间">{data.createTime} </Descriptions.Item>
         <Descriptions.Item label="更新时间">{data.updateTime} </Descriptions.Item>
       </Descriptions>
+
     </Card>
+      <Card>
+        <Form
+          layout={"vertical"}
+          name="basic"
+          initialValues={{ remember: true }}
+          onFinish={(values) => {
+            console.log(values)
+          } }
+          autoComplete="off"
+        >
+          <Form.Item
+            label="请求参数"
+            name="requestParams"
+            rules={[{ required: true, message: '请求参数不能为空!' }]}
+          >
+            <Input.TextArea />
+          </Form.Item>
+          <Form.Item  >
+            <Button type="primary" htmlType="submit">
+              发送
+            </Button>
+          </Form.Item>
+
+        </Form>
+      </Card>
     </PageContainer>
   );
 };
