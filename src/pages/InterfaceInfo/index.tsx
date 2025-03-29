@@ -4,9 +4,10 @@ import {  useParams} from '@umijs/max';
 import {Card, theme} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {
-  getInterfaceInfoByIdUsingGet
+  getInterfaceInfoByIdUsingGet, invokeInterfaceInfoUsingPost
 } from "@/services/api-backend/interfaceInfoController";
 import {CheckCircleOutlined, CloseCircleOutlined} from "@ant-design/icons";
+import {values} from "lodash";
 
 /**
  * 每个单独的卡片，为了复用样式抽成了组件
@@ -17,10 +18,12 @@ import {CheckCircleOutlined, CloseCircleOutlined} from "@ant-design/icons";
 
 const InterfaceInfo: React.FC = () => {
   const [loading, setLoading] = useState(false)
+  const [invokeLoading, setInvokeLoading] = useState(false)
+  const [invokeResult, setInvokeResult] = useState<API.InterfaceInfoInvokeResponse>()
   const [data, setData] = useState<API.InterfaceInfo>([])
   const params = useParams()
 
-  const loadList = async () => {
+  const loadData = async () => {
     setLoading(true)
     try {
       const res = await getInterfaceInfoByIdUsingGet({
@@ -33,12 +36,26 @@ const InterfaceInfo: React.FC = () => {
     setLoading(false)
   }
 
+  const onFinish = async (values:API.InterfaceInfoInvokeRequest) => {
+    setInvokeLoading(true)
+    try {
+      const res = await  invokeInterfaceInfoUsingPost({
+        id:Number(params.id),
+        ...values
+      })
+    setInvokeResult(res?.data)
+    } catch (error:any) {
+      message.error('加载失败‘,' + error.message);
+    }
+    setInvokeLoading(false)
+  }
+
   useEffect(() => {
-    loadList()
+    loadData()
   }, [])
   return (
     <PageContainer  >
-    <Card title={ data.status === 1 ? <Tag icon={<CheckCircleOutlined />} color="success">正常 </Tag> :
+    <Card loading={loading} title={ data.status === 1 ? <Tag icon={<CheckCircleOutlined />} color="success">正常 </Tag> :
          <Tag icon={<CloseCircleOutlined />} color="error"> 已关闭 </Tag> }
           extra={<a href="#" onClick={() => history.back()}>返回</a>}>
       <Descriptions title={data.name} column={1}>
@@ -58,9 +75,7 @@ const InterfaceInfo: React.FC = () => {
           layout={"vertical"}
           name="basic"
           initialValues={{ remember: true }}
-          onFinish={(values) => {
-            console.log(values)
-          } }
+          onFinish={onFinish}
           autoComplete="off"
         >
           <Form.Item
@@ -75,8 +90,12 @@ const InterfaceInfo: React.FC = () => {
               发送
             </Button>
           </Form.Item>
-
         </Form>
+      </Card>
+      <Card loading={invokeLoading}>
+        <pre>
+          {invokeResult}
+        </pre>
       </Card>
     </PageContainer>
   );
